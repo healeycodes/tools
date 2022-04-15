@@ -26,6 +26,15 @@ el
 # utils/  .gitignore  el  go.mod  main.go  README.md
 ```
 
+## kat (cat)
+
+A replacement for (my usage of) `cat`. I've only ever passed a file argument or piped to `cat`. I haven't used any of the [flags](https://man7.org/linux/man-pages/man1/cat.1.html).
+
+```
+echo 1 | kat
+# 1
+```
+
 ## Tests
 
 Test all projects.
