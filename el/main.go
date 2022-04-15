@@ -16,7 +16,7 @@ var (
 )
 
 func main() {
-	var allFlag = flag.Bool("a", false, "do not ignore entries starting with .")
+	var hideDotFilesFlag = flag.Bool("h", false, "ignore entries starting with .")
 	var dateFlag = flag.Bool("d", false, "display, and sort by, date")
 	flag.Parse()
 
@@ -25,6 +25,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	display := utils.ListFiles(path, *allFlag, *dateFlag)
+	display := utils.ListFiles(path, *hideDotFilesFlag, *dateFlag)
 	fmt.Println(display)
 }

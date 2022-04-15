@@ -22,7 +22,7 @@ type file struct {
 	size int
 }
 
-func ListFiles(path string, all bool, date bool) string {
+func ListFiles(path string, hideDotFiles bool, date bool) string {
 	dir, err := os.ReadDir(path)
 	if err != nil {
 		log.Fatal(err)
@@ -36,14 +36,7 @@ func ListFiles(path string, all bool, date bool) string {
 		}
 
 		name := info.Name()
-		if all {
-			files = append(files, file{
-				info.IsDir(),
-				name,
-				info.ModTime(),
-				int(info.Size()),
-			})
-		} else if len(name) > 0 && name[0] != DOT {
+		if !hideDotFiles || len(name) > 0 && name[0] != DOT {
 			files = append(files, file{
 				info.IsDir(),
 				name,
