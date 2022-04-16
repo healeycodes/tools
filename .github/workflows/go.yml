@@ -20,12 +20,13 @@ jobs:
 
     - name: Build
       run: |
-        cd grup && go build -v .
-        cd el && go build -v .
-        cd kat && go build -v .
+        ls
+        cd grup/ && go build -v .
+        cd el/ && go build -v .
+        cd kat/ && go build -v .
 
     - name: Test
       run: |
-        cd grup && go test -v ./...
-        cd el && go test -v ./...
-        cd kat && go test -v ./...
+        cd grup/ && go test -v ./...
+        cd el/ && go test -v ./...
+        cd kat/ && go test -v ./...
