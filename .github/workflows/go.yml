@@ -22,11 +22,15 @@ jobs:
       run: |
         ls
         cd grup/ && go build -v .
+        cd ..
         cd el/ && go build -v .
+        cd ..
         cd kat/ && go build -v .
 
     - name: Test
       run: |
         cd grup/ && go test -v ./...
+        cd ..
         cd el/ && go test -v ./...
+        cd ..
         cd kat/ && go test -v ./...
