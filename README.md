@@ -10,10 +10,9 @@ A replacement for (my usage of) `grep`.
 
 Quirks:
 
+- Search the pipe, or recursively search the given directory
+- There's a space after the line number so, e.g. with VS Code, you can click through to the file
 - RegExp syntax: https://github.com/google/re2/wiki/Syntax
-- Piping behavior is very similar to `grep`
-- If there's no pipe, recursively search the given directory
-- To search current directory, use `.`
 
 Example:
 
