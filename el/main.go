@@ -22,7 +22,7 @@ func main() {
 
 	path, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Couldn't get working directory: %s", err)
 	}
 
 	display := utils.ListFiles(path, *hideDotFilesFlag, *dateFlag)

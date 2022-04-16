@@ -4,9 +4,33 @@ This is a learning project and a chance to take ownership over the common termin
 
 I hope to add to this monorepo over time.
 
+## grup (grep)
+
+A replacement for (my usage of) `grep`.
+
+Quirks:
+
+- RegExp syntax: https://github.com/google/re2/wiki/Syntax
+- Piping behavior is very similar to `grep`
+- If there's no pipe, recursively search the given directory
+- To search current directory, use `.`
+
+Example:
+
+```
+grup ^module .
+# go.mod:1 module github.com/healeycodes/tools
+
+grup "\"bufio\"" .
+# main.go:4       "bufio"
+
+echo 1 | grup 1
+# 1
+```
+
 ## el (ls)
 
-A replacement for (my usage of) `ls`. Turns out I rely on about 1% of the available [flags](https://man7.org/linux/man-pages/man1/ls.1.html).
+A replacement for (my usage of) `ls`.
 
 Options:
 
@@ -28,10 +52,16 @@ el
 
 ## kat (cat)
 
-A replacement for (my usage of) `cat`. I've only ever passed a file argument or piped to `cat`. I haven't used any of the [flags](https://man7.org/linux/man-pages/man1/cat.1.html).
+A replacement for (my usage of) `cat`. I've only ever passed a file argument or piped to `cat`.
+
+Example:
 
 ```
 echo 1 | kat
+# 1
+
+echo 1 >> some_file
+kat some_file
 # 1
 ```
 

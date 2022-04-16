@@ -25,14 +25,14 @@ type file struct {
 func ListFiles(path string, hideDotFiles bool, date bool) string {
 	dir, err := os.ReadDir(path)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Couldn't read %s: %s", dir, err)
 	}
 
 	files := make([]file, 0)
 	for _, item := range dir {
 		info, err := item.Info()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Couldn't stat %s: %s", item, err)
 		}
 
 		name := info.Name()
