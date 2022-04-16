@@ -9,7 +9,7 @@ import (
 
 var (
 	TEST_FILE             = "./printer_test_files/a"
-	TEST_STRING_FROM_FILE = `a👍`
+	TEST_STRING_FROM_FILE = "a👍"
 )
 
 func TestStreamFromReader(t *testing.T) {
