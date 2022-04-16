@@ -1,0 +1,36 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Build
+      run: |
+        ls
+        cd grup/ && go build -v .
+        cd ..
+        cd el/ && go build -v .
+        cd ..
+        cd kat/ && go build -v .
+
+    - name: Test
+      run: |
+        cd grup/ && go test -v ./...
+        cd ..
+        cd el/ && go test -v ./...
+        cd ..
+        cd kat/ && go test -v ./...

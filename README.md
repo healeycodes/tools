@@ -1,3 +1,5 @@
+[![Go](https://github.com/healeycodes/tools/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/healeycodes/tools/actions/workflows/go.yml)
+
 # 🛠️ tools
 
 This is a learning project and a chance to take ownership over the common terminal tools I rely on every day.
