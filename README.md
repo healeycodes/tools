@@ -2,7 +2,7 @@
 
 This is a learning project and a chance to take ownership over the common terminal tools I rely on every day.
 
-I hope to add to this monorepo over time!
+These programs are toys, and I hope to add to this monorepo over time.
 
 ## Projects
 
