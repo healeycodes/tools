@@ -25,7 +25,13 @@ func main() {
 			if err != nil {
 				log.Fatalf("Couldn't stat stdin: %s", err)
 			}
-			if info.IsDir() {
+			if fp == "." {
+				path, err := os.Getwd()
+				if err != nil {
+					log.Fatalf("Couldn't get working directory: %s", err)
+				}
+				utils.Recurse(r, path)
+			} else if info.IsDir() {
 				utils.Recurse(r, fp)
 			} else {
 				utils.Search(r, bufio.NewReader(utils.Open(fp)), &utils.Opts{Fp: &fp})
