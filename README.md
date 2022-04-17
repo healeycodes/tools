@@ -36,7 +36,7 @@ A replacement for (my usage of) `ls`.
 Options:
 
 - `-h` ignore entries starting with `.`
-- `-d` display, and sort by, date
+- `-d` sort by date and display metadata
 
 Quirks:
 
