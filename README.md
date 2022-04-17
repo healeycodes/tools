@@ -2,7 +2,7 @@
 
 This is a learning project and a chance to take ownership over the common terminal tools I rely on every day.
 
-I hope to add to this monorepo over time.
+I hope to add to this monorepo over time!
 
 ## Projects
 
@@ -58,7 +58,7 @@ el -d utils/
 
 ### kat (cat)
 
-A replacement for (my usage of) `cat`. I've only ever passed a file argument or piped to `cat`.
+A replacement for (my usage of) `cat`.
 
 Example:
 
