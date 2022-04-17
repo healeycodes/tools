@@ -33,7 +33,7 @@ func TestSearch(t *testing.T) {
 	want := `c
 `
 	if string(out) != want {
-		t.Errorf("TestStreamFromFile was incorrect, got: %s, want: %s", out, want)
+		t.Errorf("TestSearch was incorrect, got: %s, want: %s", out, want)
 	}
 }
 
@@ -60,6 +60,6 @@ func TestRecurse(t *testing.T) {
 	wantWin := `finder_test_files\a\b:1 b
 `
 	if string(out) != wantUnix && string(out) != wantWin {
-		t.Errorf("TestStreamFromFile was incorrect, got: %s, want: %s", out, wantUnix)
+		t.Errorf("TestRecurse was incorrect, got: %s, want: %s", out, wantUnix)
 	}
 }
