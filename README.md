@@ -18,7 +18,7 @@ Quirks:
 
 Example:
 
-```
+```bash
 grup ^module .
 # go.mod:1 module github.com/healeycodes/tools
 
@@ -46,7 +46,7 @@ Quirks:
 
 Example:
 
-```
+```bash
 el
 # utils/  .gitignore  el  go.mod  main.go  README.md
 
@@ -62,7 +62,7 @@ A replacement for (my usage of) `cat`. I've only ever passed a file argument or 
 
 Example:
 
-```
+```bash
 echo 1 | kat
 # 1
 
