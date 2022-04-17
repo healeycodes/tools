@@ -21,7 +21,15 @@ func main() {
 
 	if len(os.Args) > 2 {
 		for _, fp := range os.Args[2:] {
-			utils.Recurse(r, fp)
+			info, err := os.Stdin.Stat()
+			if err != nil {
+				log.Fatalf("Couldn't stat stdin: %s", err)
+			}
+			if info.IsDir() {
+				utils.Recurse(r, fp)
+			} else {
+				utils.Search(r, bufio.NewReader(utils.Open(fp)), &utils.Opts{Fp: &fp})
+			}
 		}
 		return
 	} else {

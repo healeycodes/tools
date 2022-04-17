@@ -11,10 +11,10 @@ import (
 )
 
 type Opts struct {
-	fp *string
+	Fp *string
 }
 
-func open(fp string) *os.File {
+func Open(fp string) *os.File {
 	f, err := os.Open(fp)
 	if err != nil {
 		log.Fatalf("Couldn't read from %s: %s", fp, err)
@@ -30,8 +30,8 @@ func Search(reg *regexp.Regexp, r *bufio.Reader, opts *Opts) {
 		line := scanner.Bytes()
 		if found := reg.Find(scanner.Bytes()); found != nil {
 			output := string(line)
-			if opts.fp != nil {
-				output = fmt.Sprintf("%s:%d %s", *opts.fp, c, line)
+			if opts.Fp != nil {
+				output = fmt.Sprintf("%s:%d %s", *opts.Fp, c, line)
 			}
 			fmt.Println(output)
 		}
@@ -48,7 +48,7 @@ func Recurse(reg *regexp.Regexp, root string) {
 		}
 
 		if !d.IsDir() {
-			Search(reg, bufio.NewReader(open(path)), &Opts{&path})
+			Search(reg, bufio.NewReader(Open(path)), &Opts{&path})
 		}
 		return nil
 	})
