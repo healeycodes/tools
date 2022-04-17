@@ -49,6 +49,11 @@ Example:
 ```
 el
 # utils/  .gitignore  el  go.mod  main.go  README.md
+
+el -d utils/
+# 2022-04-17 13:27  695 B listfiles_test.go
+# 2022-04-17 13:18 2.1 kB listfiles.go
+# 2022-04-15 13:49    0 B listfiles_test_files/
 ```
 
 ### kat (cat)
