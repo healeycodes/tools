@@ -4,14 +4,6 @@ This is a learning project and a chance to take ownership over the common termin
 
 I hope to add to this monorepo over time.
 
-## Tests
-
-Test all projects.
-
-```bash
-go test ./...
-```
-
 ## Projects
 
 ### grup (grep)
@@ -20,7 +12,7 @@ A replacement for (my usage of) `grep`.
 
 Quirks:
 
-- Search the pipe, or recursively search the given directory
+- Search data from a pipe, or search the given files and/or directories
 - There's a space after the line number so, e.g. with VS Code, you can click through to the file
 - RegExp syntax: https://github.com/google/re2/wiki/Syntax
 
@@ -72,4 +64,20 @@ echo 1 | kat
 echo 1 >> some_file
 kat some_file
 # 1
+```
+
+## Tests
+
+Test all projects.
+
+```bash
+./test.sh
+```
+
+## Build
+
+Build all projects (for: windows, linux, darwin).
+
+```bash
+./build.sh
 ```
