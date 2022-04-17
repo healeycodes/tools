@@ -17,14 +17,20 @@ var (
 
 func main() {
 	var hideDotFilesFlag = flag.Bool("h", false, "ignore entries starting with .")
-	var dateFlag = flag.Bool("d", false, "display, and sort by, date")
+	var detailsFlag = flag.Bool("d", false, "sort by date and display metadata")
 	flag.Parse()
 
-	path, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Couldn't get working directory: %s", err)
+	var path string
+	if len(flag.Args()) > 0 {
+		path = flag.Args()[0]
+	} else {
+		wd, err := os.Getwd()
+		if err != nil {
+			log.Fatalf("Couldn't get working directory: %s", err)
+		}
+		path = wd
 	}
 
-	display := utils.ListFiles(path, *hideDotFilesFlag, *dateFlag)
+	display := utils.ListFiles(path, *hideDotFilesFlag, *detailsFlag)
 	fmt.Println(display)
 }

@@ -22,7 +22,7 @@ type file struct {
 	size int
 }
 
-func ListFiles(path string, hideDotFiles bool, date bool) string {
+func ListFiles(path string, hideDotFiles bool, details bool) string {
 	dir, err := os.ReadDir(path)
 	if err != nil {
 		log.Fatalf("Couldn't read %s: %s", dir, err)
@@ -46,7 +46,7 @@ func ListFiles(path string, hideDotFiles bool, date bool) string {
 		}
 	}
 
-	if date {
+	if details {
 		// Most recent first
 		sort.Slice(files, func(i, j int) bool {
 			return files[i].date.After(files[j].date)
@@ -65,19 +65,19 @@ func ListFiles(path string, hideDotFiles bool, date bool) string {
 
 	output := make([]string, 0)
 	for _, file := range files {
-		output = append(output, formatFile(file, date))
+		output = append(output, formatFile(file, details))
 	}
 
-	if date {
+	if details {
 		return strings.Join(output, LINEBREAK)
 	} else {
 		return strings.Join(output, SEPARATOR)
 	}
 }
 
-func formatFile(file file, date bool) string {
-	if date {
-		return fmt.Sprintf("%s %s%s", file.date.Format("2006-01-02 15:04"), file.name, dirChar(file.dir))
+func formatFile(file file, details bool) string {
+	if details {
+		return fmt.Sprintf("%s %6s %s%s", file.date.Format("2006-01-02 15:04"), byteCountSI(file.size), file.name, dirChar(file.dir))
 	}
 	return fmt.Sprintf("%s%s", file.name, dirChar(file.dir))
 }
@@ -87,4 +87,19 @@ func dirChar(dir bool) string {
 		return "/"
 	}
 	return ""
+}
+
+// https://yourbasic.org/golang/formatting-byte-size-to-human-readable-format/
+func byteCountSI(b int) string {
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB",
+		float64(b)/float64(div), "kMGTPE"[exp])
 }

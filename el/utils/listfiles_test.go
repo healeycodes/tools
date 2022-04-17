@@ -23,17 +23,6 @@ func TestListFilesNoArgs(t *testing.T) {
 	}
 }
 
-func TestListFilesWithDate(t *testing.T) {
-	// Prepend, and sort by, date
-// 	date := ListFiles(TEST_FILES, false, true)
-// 	want := `2022-04-15 13:49 .dot
-// 2022-04-15 13:05 _/
-// 2022-04-15 13:02 b
-// 2022-04-15 13:02 c`
-
-	// TODO: Fix this to work in a CI with unreliable file dates
-}
-
 func TestListFilesHideDotFiles(t *testing.T) {
 	// Hide dot files
 	all := ListFiles(TEST_FILES, true, false)
@@ -41,16 +30,4 @@ func TestListFilesHideDotFiles(t *testing.T) {
 	if all != want {
 		t.Errorf("TestListFilesHideDotFiles was incorrect, got: %s, want: %s.", all, want)
 	}
-}
-
-func TestListFilesWithDateAndHideDotFiles(t *testing.T) {
-	// Hide dot files
-	// (and)
-	// Prepend, and sort by, date
-// 	allDate := ListFiles(TEST_FILES, true, true)
-// 	want := `2022-04-15 13:05 _/
-// 2022-04-15 13:02 b
-// 2022-04-15 13:02 c`
-	
-	// TODO: Fix this to work in a CI with unreliable file dates
 }
