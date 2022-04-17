@@ -17,11 +17,6 @@ jobs:
         with:
           go-version: 1.18
 
-      - name: Build
-        run: |
-          chmod +x ./build.sh
-          ./build.sh
-
       - name: Test
         run: |
           chmod +x ./test.sh
