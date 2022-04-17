@@ -1,12 +1,20 @@
-[![Go](https://github.com/healeycodes/tools/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/healeycodes/tools/actions/workflows/go.yml)
-
 # 🛠️ tools
 
 This is a learning project and a chance to take ownership over the common terminal tools I rely on every day.
 
 I hope to add to this monorepo over time.
 
-## grup (grep)
+## Tests
+
+Test all projects.
+
+```bash
+go test ./...
+```
+
+## Projects
+
+### grup (grep)
 
 A replacement for (my usage of) `grep`.
 
@@ -29,7 +37,7 @@ echo 1 | grup 1
 # 1
 ```
 
-## el (ls)
+### el (ls)
 
 A replacement for (my usage of) `ls`.
 
@@ -51,7 +59,7 @@ el
 # utils/  .gitignore  el  go.mod  main.go  README.md
 ```
 
-## kat (cat)
+### kat (cat)
 
 A replacement for (my usage of) `cat`. I've only ever passed a file argument or piped to `cat`.
 
@@ -64,12 +72,4 @@ echo 1 | kat
 echo 1 >> some_file
 kat some_file
 # 1
-```
-
-## Tests
-
-Test all projects.
-
-```bash
-go test ./...
 ```
