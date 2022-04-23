@@ -6,12 +6,13 @@ Searching: facebook/react (6d3b6d0f), 98915 files (a mix of text and binary), ~1
 
 Results:
 
-- fgrep -r -n packages/react-fetch react/  8.77s user 1.98s system 67% cpu 15.852 total
-- grep -r -n packages/react-fetch react/  8.67s user 1.93s system 69% cpu 15.256 total
-- grup -n packages/react-fetch react/  0.96s user 2.10s system 41% cpu 7.436 total
-- rg -n packages/react-fetch react/  0.03s user 0.15s system 357% cpu 0.050 total
-- rg -uuu -n packages/react-fetch react/  0.80s user 3.49s system 269% cpu 1.595 total
-- sift -n packages/react-fetch react/  1.45s user 3.44s system 254% cpu 1.918 total
+```
+grep -F -r -n packages/react-fetch react/  8.64s user 1.31s system 99% cpu 9.948 total
+grup -n packages/react-fetch react/  0.85s user 1.41s system 107% cpu 2.091 total
+rg -n packages/react-fetch react/  0.04s user 0.19s system 488% cpu 0.046 total
+rg -uuu -n packages/react-fetch react/  0.87s user 4.08s system 717% cpu 0.690 total
+``` 
+
 
 `rg` clearly winning (even if you force it to search ignored files and binary files).
 
