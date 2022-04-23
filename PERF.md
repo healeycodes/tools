@@ -16,3 +16,11 @@ Results:
 `rg` clearly winning (even if you force it to search ignored files and binary files).
 
 Surprising that `grup` is 2x as fast as `grep`.
+
+
+Versions:
+- fgrep (BSD grep, GNU compatible) 2.6.0-FreeBSD
+- grep (BSD grep, GNU compatible) 2.6.0-FreeBSD
+- grup (d5d43f90)
+- ripgrep 13.0.0 -SIMD -AVX (compiled)
+- sift 0.9.0 (darwin/arm64)
