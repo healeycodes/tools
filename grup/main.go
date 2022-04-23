@@ -1,50 +1,49 @@
 package main
 
 import (
-	"bufio"
+	"flag"
 	"log"
-	"os"
 	"regexp"
 
 	"github.com/healeycodes/tools/utils"
 )
 
+func parseArgs(flagArgs []string) (string, string) {
+	if len(flagArgs) < 2 {
+		log.Fatal("usage: fgrup <query> <path>")
+	}
+	return flagArgs[0], flagArgs[1]
+}
+
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Missing query argument")
-	}
+	var lines = flag.Bool("n", false, "display line number for non-binary files")
+	var regex = flag.Bool("re", false, "treat query as a regex")
+	flag.Parse()
+	query, path := parseArgs(flag.Args())
 
-	r, err := regexp.Compile(os.Args[1])
-	if err != nil {
-		log.Fatalf("Bad regex: %s", err)
-	}
-
-	if len(os.Args) > 2 {
-		for _, fp := range os.Args[2:] {
-			info, err := os.Stdin.Stat()
-			if err != nil {
-				log.Fatalf("Couldn't stat stdin: %s", err)
-			}
-			if fp == "." {
-				path, err := os.Getwd()
-				if err != nil {
-					log.Fatalf("Couldn't get working directory: %s", err)
-				}
-				utils.Recurse(r, path)
-			} else if info.IsDir() {
-				utils.Recurse(r, fp)
-			} else {
-				utils.Search(r, bufio.NewReader(utils.Open(fp)), &utils.Opts{Fp: &fp})
-			}
-		}
-		return
-	} else {
-		info, err := os.Stdin.Stat()
+	var opts *utils.SearchOptions
+	if *regex {
+		r, err := regexp.Compile(query)
 		if err != nil {
-			log.Fatalf("Couldn't stat stdin: %s", err)
+			log.Fatalf("Bad regex: %s", err)
 		}
-		if (info.Mode()&os.ModeCharDevice) == 0 || info.Size() <= 0 {
-			utils.Search(r, bufio.NewReader(os.Stdin), &utils.Opts{})
+		opts = &utils.SearchOptions{
+			Kind:   utils.REGEX,
+			Lines:  *lines,
+			Regex:  r,
+			Finder: nil,
 		}
+	} else {
+		opts = &utils.SearchOptions{
+			Kind:   utils.LITERAL,
+			Lines:  *lines,
+			Regex:  nil,
+			Finder: utils.MakeStringFinder([]byte(query)),
+		}
+	}
+
+	err := utils.SearchPath(path, opts)
+	if err != nil {
+		log.Fatalf("couldn't search path %s: %s", path, err)
 	}
 }

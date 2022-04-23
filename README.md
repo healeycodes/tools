@@ -10,23 +10,24 @@ These programs are toys, and I hope to add to this monorepo over time.
 
 A replacement for (my usage of) `grep`.
 
+Options:
+
+- `-n` show line numbers
+- `-re` treat query as a regular expression
+
 Quirks:
 
-- Search data from a pipe, or search the given files and/or directories
-- There's a space after the line number so, e.g. with VS Code, you can click through to the file
+- Unless target path is a file, recursively searches by default
 - RegExp syntax: https://github.com/google/re2/wiki/Syntax
 
 Example:
 
 ```bash
-grup ^module .
+grup -l -re ^module .
 # go.mod:1 module github.com/healeycodes/tools
 
-grup "\"bufio\"" .
+grup -l "\"bufio\"" .
 # main.go:4       "bufio"
-
-echo 1 | grup 1
-# 1
 ```
 
 ### el (ls)
