@@ -8,18 +8,19 @@ import (
 	"github.com/healeycodes/tools/utils"
 )
 
-func parseArgs(flagArgs []string) (string, string) {
+func parseArgs(flagArgs []string) (string, []string) {
 	if len(flagArgs) < 2 {
 		log.Fatal("usage: fgrup <query> <path>")
 	}
-	return flagArgs[0], flagArgs[1]
+	paths := []string{flagArgs[1]}
+	return flagArgs[0], paths
 }
 
 func main() {
 	var lines = flag.Bool("n", false, "display line number for non-binary files")
 	var regex = flag.Bool("re", false, "treat query as a regex")
 	flag.Parse()
-	query, path := parseArgs(flag.Args())
+	query, paths := parseArgs(flag.Args())
 
 	var opts *utils.SearchOptions
 	if *regex {
@@ -42,8 +43,5 @@ func main() {
 		}
 	}
 
-	err := utils.SearchPath(path, opts)
-	if err != nil {
-		log.Fatalf("couldn't search path %s: %s", path, err)
-	}
+	utils.Search(paths, opts)
 }

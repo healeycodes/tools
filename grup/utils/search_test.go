@@ -24,7 +24,7 @@ func TestSearchPathWithLines(t *testing.T) {
 		nil,
 		MakeStringFinder([]byte("c")),
 	}
-	SearchPath(TEST_FILES_DIR, opts)
+	Search([]string{TEST_FILES_DIR}, opts)
 
 	// ------------------------
 	w.Close()
@@ -52,7 +52,7 @@ func TestSearchPathWithoutLines(t *testing.T) {
 		nil,
 		MakeStringFinder([]byte("b")),
 	}
-	SearchPath(TEST_FILES_DIR, opts)
+	Search([]string{TEST_FILES_DIR}, opts)
 
 	// ------------------------
 	w.Close()
@@ -82,7 +82,7 @@ func TestSearchPathRegexWithLines(t *testing.T) {
 		r,
 		nil,
 	}
-	SearchPath(TEST_FILES_DIR, opts)
+	Search([]string{TEST_FILES_DIR}, opts)
 
 	// ------------------------
 	w.Close()

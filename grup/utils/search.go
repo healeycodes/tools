@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sync"
 )
 
 const (
@@ -21,7 +22,43 @@ type SearchOptions struct {
 	Finder *stringFinder
 }
 
-func SearchPath(path string, opts *SearchOptions) error {
+type searchJob struct {
+	paths []string
+	opts  *SearchOptions
+	wg    *sync.WaitGroup
+}
+
+func searchWorker(searchJobs chan *searchJob, completedJobs chan struct{}) {
+	for j := range searchJobs {
+		for _, path := range j.paths {
+			SearchPath(j.wg, path, j.opts, searchJobs, completedJobs)
+			completedJobs <- struct{}{}
+		}
+	}
+}
+
+func Search(paths []string, opts *SearchOptions) {
+	searchJobs := make(chan *searchJob)
+	completedJobs := make(chan struct{}, 16)
+
+	for w := 0; w < 16; w++ {
+		go searchWorker(searchJobs, completedJobs)
+	}
+
+	var wg sync.WaitGroup
+
+	completedJobs <- struct{}{}
+	wg.Add(1)
+	searchJobs <- &searchJob{
+		paths,
+		opts,
+		&wg,
+	}
+	wg.Wait()
+}
+
+func SearchPath(wg *sync.WaitGroup, path string, opts *SearchOptions, searchJobs chan *searchJob, completedJobs chan struct{}) error {
+	defer wg.Done()
 	info, err := os.Lstat(path)
 	if err != nil {
 		return err
@@ -39,14 +76,18 @@ func SearchPath(path string, opts *SearchOptions) error {
 	if err != nil {
 		return err
 	}
-	f.Close()
 
-	for _, dirPath := range dirNames {
-		joined := filepath.Join(path, dirPath)
-		err = SearchPath(joined, opts)
-		if err != nil {
-			return err
-		}
+	paths := make([]string, len(dirNames))
+	for i, dirPath := range dirNames {
+		paths[i] = filepath.Join(path, dirPath)
+	}
+
+	wg.Add(len(dirNames))
+	<-completedJobs
+	searchJobs <- &searchJob{
+		paths,
+		opts,
+		wg,
 	}
 	return nil
 }
@@ -71,7 +112,7 @@ func SearchFile(path string, opts *SearchOptions) error {
 			if opts.Finder.next(text) != -1 {
 				if isBinary {
 					fmt.Printf("Binary file %s matches\n", path)
-					return nil
+					return err
 				} else if opts.Lines {
 					fmt.Printf("%s:%d %s\n", path, line, text)
 				} else {
@@ -82,7 +123,7 @@ func SearchFile(path string, opts *SearchOptions) error {
 			if opts.Regex.Find(scanner.Bytes()) != nil {
 				if isBinary {
 					fmt.Printf("Binary file %s matches\n", path)
-					return nil
+					return err
 				} else if opts.Lines {
 					fmt.Printf("%s:%d %s\n", path, line, text)
 				} else {
