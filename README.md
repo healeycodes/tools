@@ -16,7 +16,7 @@ Options:
 
 Quirks:
 
-- Unless target path is a file, recursively searches by default
+- Recursively searches by default (similar to other `grep` replacements)
 - RegExp syntax: https://github.com/google/re2/wiki/Syntax
 
 Example:
