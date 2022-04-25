@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -23,117 +24,98 @@ type SearchOptions struct {
 }
 
 type searchJob struct {
-	paths []string
-	opts  *SearchOptions
-	wg    *sync.WaitGroup
-}
-
-func searchWorker(searchJobs chan *searchJob, completedJobs chan struct{}) {
-	for j := range searchJobs {
-		for _, path := range j.paths {
-			SearchPath(j.wg, path, j.opts, searchJobs, completedJobs)
-			completedJobs <- struct{}{}
-		}
-	}
+	path string
+	opts *SearchOptions
 }
 
 func Search(paths []string, opts *SearchOptions) {
 	searchJobs := make(chan *searchJob)
-	completedJobs := make(chan struct{}, 16)
-
-	for w := 0; w < 16; w++ {
-		go searchWorker(searchJobs, completedJobs)
-	}
 
 	var wg sync.WaitGroup
-
-	completedJobs <- struct{}{}
-	wg.Add(1)
-	searchJobs <- &searchJob{
-		paths,
-		opts,
-		&wg,
+	for w := 0; w < 16; w++ {
+		go searchWorker(searchJobs, &wg)
+	}
+	for _, path := range paths {
+		dirTraversal(path, opts, searchJobs, &wg)
 	}
 	wg.Wait()
 }
 
-func SearchPath(wg *sync.WaitGroup, path string, opts *SearchOptions, searchJobs chan *searchJob, completedJobs chan struct{}) error {
-	defer wg.Done()
+func dirTraversal(path string, opts *SearchOptions, searchJobs chan *searchJob, wg *sync.WaitGroup) {
 	info, err := os.Lstat(path)
 	if err != nil {
-		return err
+		log.Fatalf("couldn't lstat path %s: %s\n", path, err)
 	}
 
 	if !info.IsDir() {
-		return SearchFile(path, opts)
+		wg.Add(1)
+		searchJobs <- &searchJob{
+			path,
+			opts,
+		}
+		return
 	}
 
 	f, err := os.Open(path)
 	if err != nil {
-		return err
+		log.Fatalf("couldn't open path %s: %s\n", path, err)
 	}
 	dirNames, err := f.Readdirnames(-1)
 	if err != nil {
-		return err
+		log.Fatalf("couldn't read dir names for path %s: %s\n", path, err)
 	}
 
-	paths := make([]string, len(dirNames))
-	for i, dirPath := range dirNames {
-		paths[i] = filepath.Join(path, dirPath)
+	for _, deeperPath := range dirNames {
+		dirTraversal(filepath.Join(path, deeperPath), opts, searchJobs, wg)
 	}
-
-	wg.Add(len(dirNames))
-	<-completedJobs
-	searchJobs <- &searchJob{
-		paths,
-		opts,
-		wg,
-	}
-	return nil
 }
 
-func SearchFile(path string, opts *SearchOptions) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-
-	scanner := bufio.NewScanner(f)
-	isBinary := false
-
-	line := 1
-	for scanner.Scan() {
-		text := scanner.Bytes()
-		if line == 1 {
-			isBinary = bytes.IndexByte(text, 0) != -1
+func searchWorker(jobs chan *searchJob, wg *sync.WaitGroup) {
+	for job := range jobs {
+		f, err := os.Open(job.path)
+		if err != nil {
+			log.Fatalf("couldn't open path %s: %s\n", job.path, err)
 		}
 
-		if opts.Kind == LITERAL {
-			if opts.Finder.next(text) != -1 {
-				if isBinary {
-					fmt.Printf("Binary file %s matches\n", path)
-					return err
-				} else if opts.Lines {
-					fmt.Printf("%s:%d %s\n", path, line, text)
-				} else {
-					fmt.Printf("%s %s\n", path, text)
+		scanner := bufio.NewScanner(f)
+		isBinary := false
+
+		line := 1
+		for scanner.Scan() && !isBinary {
+			text := scanner.Bytes()
+
+			// Check the first buffer for NUL
+			if line == 1 {
+				isBinary = bytes.IndexByte(text, 0) != -1
+			}
+
+			if job.opts.Kind == LITERAL {
+				if job.opts.Finder.next(text) != -1 {
+					if isBinary {
+						fmt.Printf("Binary file %s matches\n", job.path)
+						continue
+					} else if job.opts.Lines {
+						fmt.Printf("%s:%d %s\n", job.path, line, text)
+					} else {
+						fmt.Printf("%s %s\n", job.path, text)
+					}
+				}
+			} else if job.opts.Kind == REGEX {
+				if job.opts.Regex.Find(scanner.Bytes()) != nil {
+					if isBinary {
+						fmt.Printf("Binary file %s matches\n", job.path)
+						continue
+					} else if job.opts.Lines {
+						fmt.Printf("%s:%d %s\n", job.path, line, text)
+					} else {
+						fmt.Printf("%s %s\n", job.path, text)
+					}
 				}
 			}
-		} else if opts.Kind == REGEX {
-			if opts.Regex.Find(scanner.Bytes()) != nil {
-				if isBinary {
-					fmt.Printf("Binary file %s matches\n", path)
-					return err
-				} else if opts.Lines {
-					fmt.Printf("%s:%d %s\n", path, line, text)
-				} else {
-					fmt.Printf("%s %s\n", path, text)
-				}
-			}
+			line++
 		}
-		line++
+		wg.Done()
 	}
-	return nil
 }
 
 // Below, is Go's internal Boyer-Moore string search algorithm, it has been

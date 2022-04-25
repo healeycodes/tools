@@ -77,7 +77,7 @@ func TestSearchPathRegexWithLines(t *testing.T) {
 
 	r, _ := regexp.Compile("b")
 	opts := &SearchOptions{
-		LITERAL,
+		REGEX,
 		false,
 		r,
 		nil,
