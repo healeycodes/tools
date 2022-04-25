@@ -11,6 +11,10 @@ import (
 	"sync"
 )
 
+type SearchDebug struct {
+	Workers int
+}
+
 const (
 	LITERAL = iota
 	REGEX
@@ -28,11 +32,11 @@ type searchJob struct {
 	opts *SearchOptions
 }
 
-func Search(paths []string, opts *SearchOptions) {
+func Search(paths []string, opts *SearchOptions, debug *SearchDebug) {
 	searchJobs := make(chan *searchJob)
 
 	var wg sync.WaitGroup
-	for w := 0; w < 16; w++ {
+	for w := 0; w < debug.Workers; w++ {
 		go searchWorker(searchJobs, &wg)
 	}
 	for _, path := range paths {
@@ -81,7 +85,7 @@ func searchWorker(jobs chan *searchJob, wg *sync.WaitGroup) {
 		isBinary := false
 
 		line := 1
-		for scanner.Scan() && !isBinary {
+		for scanner.Scan() {
 			text := scanner.Bytes()
 
 			// Check the first buffer for NUL
@@ -93,7 +97,7 @@ func searchWorker(jobs chan *searchJob, wg *sync.WaitGroup) {
 				if job.opts.Finder.next(text) != -1 {
 					if isBinary {
 						fmt.Printf("Binary file %s matches\n", job.path)
-						continue
+						break
 					} else if job.opts.Lines {
 						fmt.Printf("%s:%d %s\n", job.path, line, text)
 					} else {
@@ -104,7 +108,7 @@ func searchWorker(jobs chan *searchJob, wg *sync.WaitGroup) {
 				if job.opts.Regex.Find(scanner.Bytes()) != nil {
 					if isBinary {
 						fmt.Printf("Binary file %s matches\n", job.path)
-						continue
+						break
 					} else if job.opts.Lines {
 						fmt.Printf("%s:%d %s\n", job.path, line, text)
 					} else {

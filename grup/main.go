@@ -19,10 +19,15 @@ func parseArgs(flagArgs []string) (string, []string) {
 func main() {
 	var lines = flag.Bool("n", false, "display line number for non-binary files")
 	var regex = flag.Bool("re", false, "treat query as a regex")
+	var workers = flag.Int("w", 16, "[debug] set number of search workers")
 	flag.Parse()
-	query, paths := parseArgs(flag.Args())
 
+	query, paths := parseArgs(flag.Args())
+	debug := &utils.SearchDebug{
+		Workers: *workers,
+	}
 	var opts *utils.SearchOptions
+
 	if *regex {
 		r, err := regexp.Compile(query)
 		if err != nil {
@@ -43,5 +48,5 @@ func main() {
 		}
 	}
 
-	utils.Search(paths, opts)
+	utils.Search(paths, opts, debug)
 }

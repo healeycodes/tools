@@ -24,7 +24,10 @@ func TestSearchPathWithLines(t *testing.T) {
 		nil,
 		MakeStringFinder([]byte("c")),
 	}
-	Search([]string{TEST_FILES_DIR}, opts)
+	debug := &SearchDebug{
+		16,
+	}
+	Search([]string{TEST_FILES_DIR}, opts, debug)
 
 	// ------------------------
 	w.Close()
@@ -33,6 +36,37 @@ func TestSearchPathWithLines(t *testing.T) {
 	// ------------------------
 
 	want := `finder_test_files/c:1 c
+`
+	if string(out) != want {
+		t.Errorf("TestSearchPath1 was incorrect, got: %s, want: %s", out, want)
+	}
+}
+
+func TestSearchPathWithLinesForBinary(t *testing.T) {
+	// ----------------------
+	rescueStdout := os.Stdout
+	r2, w, _ := os.Pipe()
+	os.Stdout = w
+	// ----------------------
+
+	opts := &SearchOptions{
+		LITERAL,
+		true,
+		nil,
+		MakeStringFinder([]byte("z")),
+	}
+	debug := &SearchDebug{
+		16,
+	}
+	Search([]string{TEST_FILES_DIR}, opts, debug)
+
+	// ------------------------
+	w.Close()
+	out, _ := ioutil.ReadAll(r2)
+	os.Stdout = rescueStdout
+	// ------------------------
+
+	want := `Binary file finder_test_files/d matches
 `
 	if string(out) != want {
 		t.Errorf("TestSearchPath1 was incorrect, got: %s, want: %s", out, want)
@@ -52,7 +86,10 @@ func TestSearchPathWithoutLines(t *testing.T) {
 		nil,
 		MakeStringFinder([]byte("b")),
 	}
-	Search([]string{TEST_FILES_DIR}, opts)
+	debug := &SearchDebug{
+		16,
+	}
+	Search([]string{TEST_FILES_DIR}, opts, debug)
 
 	// ------------------------
 	w.Close()
@@ -82,7 +119,10 @@ func TestSearchPathRegexWithLines(t *testing.T) {
 		r,
 		nil,
 	}
-	Search([]string{TEST_FILES_DIR}, opts)
+	debug := &SearchDebug{
+		16,
+	}
+	Search([]string{TEST_FILES_DIR}, opts, debug)
 
 	// ------------------------
 	w.Close()
