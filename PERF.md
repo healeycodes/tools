@@ -1,27 +1,29 @@
 ### grup
 
-Some draft benchmark numbers on a Apple M1 Pro.
+Benchmark numbers for searching 99k files (1.3GB).
 
-Searching: facebook/react (6d3b6d0f), 98915 files (a mix of text and binary), ~1.3GB.
+Setup:
+- Clone facebook/react@6d3b6d0f 
+- Build it: `yarn build`
+- Run each bench command five times to warm disk cache
+- Run each bench command with `time` five times and take average (.000 accuracy)
 
-Results:
+Results (Apple M1 Pro 16GB RAM):
 
 ```
-grep -F -r -n packages/react-fetch react/  8.64s user 1.31s system 99% cpu 9.948 total
-grup -n packages/react-fetch react/  0.85s user 1.41s system 107% cpu 2.091 total
-rg -n packages/react-fetch react/  0.04s user 0.19s system 488% cpu 0.046 total
-rg -uuu -n packages/react-fetch react/  0.87s user 4.08s system 717% cpu 0.690 total
+# all report the line number of the single text file match
+# and that a single binary file has a match somewhere
+
+rg -uuu -n packages/react-fetch react/  0.87s user 4.44s system 702% cpu 0.756 total
+sift -n packages/react-fetch react/  1.55s user 4.33s system 688% cpu 0.854 total
+grup -n packages/react-fetch react/  1.66s user 3.50s system 523% cpu 0.986 total
+grep -r -n packages/react-fetch react/  8.63s user 1.32s system 99% cpu 9.954 total
 ``` 
-
-
-`rg` clearly winning (even if you force it to search ignored files and binary files).
-
-Surprising that `grup` is 2x as fast as `grep`.
 
 
 Versions:
 - fgrep (BSD grep, GNU compatible) 2.6.0-FreeBSD
 - grep (BSD grep, GNU compatible) 2.6.0-FreeBSD
-- grup (d5d43f90)
+- grup (f6a04efd)
 - ripgrep 13.0.0 -SIMD -AVX (compiled)
 - sift 0.9.0 (darwin/arm64)

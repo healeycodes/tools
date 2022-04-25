@@ -4,10 +4,16 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sync"
 )
+
+type SearchDebug struct {
+	Workers int
+}
 
 const (
 	LITERAL = iota
@@ -21,78 +27,99 @@ type SearchOptions struct {
 	Finder *stringFinder
 }
 
-func SearchPath(path string, opts *SearchOptions) error {
+type searchJob struct {
+	path string
+	opts *SearchOptions
+}
+
+func Search(paths []string, opts *SearchOptions, debug *SearchDebug) {
+	searchJobs := make(chan *searchJob)
+
+	var wg sync.WaitGroup
+	for w := 0; w < debug.Workers; w++ {
+		go searchWorker(searchJobs, &wg)
+	}
+	for _, path := range paths {
+		dirTraversal(path, opts, searchJobs, &wg)
+	}
+	wg.Wait()
+}
+
+func dirTraversal(path string, opts *SearchOptions, searchJobs chan *searchJob, wg *sync.WaitGroup) {
 	info, err := os.Lstat(path)
 	if err != nil {
-		return err
+		log.Fatalf("couldn't lstat path %s: %s\n", path, err)
 	}
 
 	if !info.IsDir() {
-		return SearchFile(path, opts)
+		wg.Add(1)
+		searchJobs <- &searchJob{
+			path,
+			opts,
+		}
+		return
 	}
 
 	f, err := os.Open(path)
 	if err != nil {
-		return err
+		log.Fatalf("couldn't open path %s: %s\n", path, err)
 	}
 	dirNames, err := f.Readdirnames(-1)
 	if err != nil {
-		return err
+		log.Fatalf("couldn't read dir names for path %s: %s\n", path, err)
 	}
-	f.Close()
 
-	for _, dirPath := range dirNames {
-		joined := filepath.Join(path, dirPath)
-		err = SearchPath(joined, opts)
-		if err != nil {
-			return err
-		}
+	for _, deeperPath := range dirNames {
+		dirTraversal(filepath.Join(path, deeperPath), opts, searchJobs, wg)
 	}
-	return nil
 }
 
-func SearchFile(path string, opts *SearchOptions) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-
-	scanner := bufio.NewScanner(f)
-	isBinary := false
-
-	line := 1
-	for scanner.Scan() {
-		text := scanner.Bytes()
-		if line == 1 {
-			isBinary = bytes.IndexByte(text, 0) != -1
+func searchWorker(jobs chan *searchJob, wg *sync.WaitGroup) {
+	for job := range jobs {
+		f, err := os.Open(job.path)
+		if err != nil {
+			log.Fatalf("couldn't open path %s: %s\n", job.path, err)
 		}
 
-		if opts.Kind == LITERAL {
-			if opts.Finder.next(text) != -1 {
-				if isBinary {
-					fmt.Printf("Binary file %s matches\n", path)
-					return nil
-				} else if opts.Lines {
-					fmt.Printf("%s:%d %s\n", path, line, text)
-				} else {
-					fmt.Printf("%s %s\n", path, text)
+		scanner := bufio.NewScanner(f)
+		isBinary := false
+
+		line := 1
+		for scanner.Scan() {
+			text := scanner.Bytes()
+
+			// Check the first buffer for NUL
+			if line == 1 {
+				isBinary = bytes.IndexByte(text, 0) != -1
+			}
+
+			if job.opts.Kind == LITERAL {
+				if job.opts.Finder.next(text) != -1 {
+					if isBinary {
+						fmt.Printf("Binary file %s matches\n", job.path)
+						break
+					} else if job.opts.Lines {
+						fmt.Printf("%s:%d %s\n", job.path, line, text)
+					} else {
+						fmt.Printf("%s %s\n", job.path, text)
+					}
+				}
+			} else if job.opts.Kind == REGEX {
+				if job.opts.Regex.Find(scanner.Bytes()) != nil {
+					if isBinary {
+						fmt.Printf("Binary file %s matches\n", job.path)
+						break
+					} else if job.opts.Lines {
+						fmt.Printf("%s:%d %s\n", job.path, line, text)
+					} else {
+						fmt.Printf("%s %s\n", job.path, text)
+					}
 				}
 			}
-		} else if opts.Kind == REGEX {
-			if opts.Regex.Find(scanner.Bytes()) != nil {
-				if isBinary {
-					fmt.Printf("Binary file %s matches\n", path)
-					return nil
-				} else if opts.Lines {
-					fmt.Printf("%s:%d %s\n", path, line, text)
-				} else {
-					fmt.Printf("%s %s\n", path, text)
-				}
-			}
+			line++
 		}
-		line++
+		wg.Done()
 	}
-	return nil
 }
 
 // Below, is Go's internal Boyer-Moore string search algorithm, it has been
