@@ -19,7 +19,7 @@ func parseArgs(flagArgs []string) (string, []string) {
 func main() {
 	var lines = flag.Bool("n", false, "display line number for non-binary files")
 	var regex = flag.Bool("re", false, "treat query as a regex")
-	var workers = flag.Int("w", 16, "[debug] set number of search workers")
+	var workers = flag.Int("w", 128, "[debug] set number of search workers")
 	flag.Parse()
 
 	query, paths := parseArgs(flag.Args())

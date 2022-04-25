@@ -1,19 +1,18 @@
 # 🛠️ tools
 
-This is a learning project and a chance to take ownership over the common terminal tools I rely on every day.
-
-These programs are toys, and I hope to add to this monorepo over time.
+A bag of toys. A project to take ownership over the terminal tools I use every day.
 
 ## Projects
 
 ### grup (grep)
 
-A replacement for (my usage of) `grep`.
+A replacement for (my usage of) `grep`. Faster than `grep`.
 
 Options:
 
 - `-n` show line numbers
 - `-re` treat query as a regular expression
+- `-w` (debug) set number of search workers
 
 Quirks:
 
@@ -23,11 +22,11 @@ Quirks:
 Example:
 
 ```bash
-grup -l -re ^module .
+grup -n -re ^module .
 # go.mod:1 module github.com/healeycodes/tools
 
-grup -l "\"bufio\"" .
-# main.go:4       "bufio"
+grup -n "\"bufio\"" .
+# utils/search.go:4 	"bufio"
 ```
 
 ### el (ls)
