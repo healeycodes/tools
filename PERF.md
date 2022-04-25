@@ -17,7 +17,7 @@ Results (Apple M1 Pro 16GB RAM):
 rg -uuu -n packages/react-fetch react/  0.87s user 4.44s system 702% cpu 0.756 total
 sift -n packages/react-fetch react/  1.55s user 4.33s system 688% cpu 0.854 total
 grup -n packages/react-fetch react/  1.66s user 3.50s system 523% cpu 0.986 total
-grep -r -n packages/react-fetch react/  8.63s user 1.32s system 99% cpu 9.954 total
+grep -F -r -n packages/react-fetch react/  8.64s user 1.23s system 99% cpu 9.883 total
 ``` 
 
 
