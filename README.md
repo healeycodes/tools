@@ -1,5 +1,9 @@
 # 🛠️ tools
 
+> My blog post: [Beating grep with Go](https://healeycodes.com/beating-grep-with-go)
+
+<br>
+
 A bag of toys. A project to take ownership over the terminal tools I use every day.
 
 ## Projects
