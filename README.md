@@ -1,3 +1,5 @@
+[![CI](https://github.com/healeycodes/tools/actions/workflows/ci.yml/badge.svg)](https://github.com/healeycodes/tools/actions/workflows/ci.yml)
+
 # 🛠️ tools
 
 > My blog post: [Beating grep with Go](https://healeycodes.com/beating-grep-with-go)
